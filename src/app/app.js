@@ -1,6 +1,4 @@
 import os from "os";
-import path from "path";
-import { fileURLToPath } from "url";
 import { UserService } from "../services/user-service/UserService.js";
 import { DirectoryManager } from "../services/directory-manager/DirectoryManager.js";
 import { InputValidator } from "../services/input-validator/InputValidator.js";
@@ -34,15 +32,10 @@ export class App {
     this.methodAllocator = this.commandService.methodAllocator;
 
     this.commandService = new CommandService();
-
-    this.__filename = fileURLToPath(import.meta.url);
-    this.__dirname = path.dirname(this.__filename);
   }
 
   async runLoop() {
-    let currentDirectory = process.cwd();
-
-    this.alertCurrentPath(currentDirectory);
+    this.alertCurrentPath();
 
     try {
       const answer = await this.asyncQuestion("");
@@ -62,6 +55,7 @@ export class App {
         command,
         inputPath,
       });
+
       await this.runLoop();
     } catch (error) {
       displayErrorMessage(OPERATION_FAILED_MESSAGE, 0);

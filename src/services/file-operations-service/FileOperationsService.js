@@ -25,8 +25,8 @@ export class FileOperationsService {
       console.log(chunk.toString());
     });
 
-    readStream.on("error", (err) => {
-      console.log(err);
+    readStream.on("error", () => {
+      console.log(OPERATION_FAILED_MESSAGE, COLORS.RED);
     });
   }
 
@@ -36,13 +36,13 @@ export class FileOperationsService {
 
     try {
       await writeFile(filePath, "");
-    } catch (error) {
-      console.log(error);
-    } finally {
+
       displayMessage(
         `The file ${fileName} was created successfully`,
         COLORS.GREEN,
       );
+    } catch (error) {
+      console.log(OPERATION_FAILED_MESSAGE, COLORS.RED);
     }
   }
 
@@ -57,13 +57,14 @@ export class FileOperationsService {
       displayMessage("Renamed successfully", COLORS.GREEN);
     } catch (error) {
       displayMessage(OPERATION_FAILED_MESSAGE, COLORS.RED);
-      console.log(error);
     }
   }
 
   copyFile(pathToFile, pathToNewDirectory) {
     const fileName = path.basename(pathToFile);
-    const fileDestination = path.join(pathToNewDirectory, fileName);
+    const __dirname = path.dirname(fileName);
+
+    const fileDestination = path.join(__dirname, pathToNewDirectory);
 
     const readableStream = fs.createReadStream(pathToFile);
     const writableStream = fs.createWriteStream(path.resolve(fileDestination));
@@ -92,9 +93,11 @@ export class FileOperationsService {
     }
   }
 
-  async moveFile(pathToFile, PathToNewDirectory) {
+  async moveFile(pathToFile, pathToNewDirectory) {
     const fileName = path.basename(pathToFile);
-    const fileDestination = path.join(PathToNewDirectory, fileName);
+    const __dirname = path.dirname(fileName);
+
+    const fileDestination = path.join(__dirname, pathToNewDirectory, fileName);
 
     const readableStream = fs.createReadStream(pathToFile);
     const writableStream = fs.createWriteStream(fileDestination);

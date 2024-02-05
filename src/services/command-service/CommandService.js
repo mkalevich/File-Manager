@@ -1,33 +1,48 @@
 import { DirectoryManager } from "../directory-manager/DirectoryManager.js";
-import { ALLOWED_INPUT_COMMANDS } from "./constants.js";
 import { FileOperationsService } from "../file-operations-service/FileOperationsService.js";
 import { OperatingSystemService } from "../operation-system-service/OperatingSystemService.js";
+import { ALLOWED_INPUT_COMMANDS } from "./constants.js";
+import { InputValidator } from "../input-validator/InputValidator.js";
+import { displayMessage } from "../../app/helpers.js";
+import { COLORS, INVALID_INPUT_MESSAGE } from "../../app/constants.js";
 
 export class CommandService {
   constructor() {
     this.methodAllocator = this.methodAllocator.bind(this);
+
     this.directoryManager = new DirectoryManager();
 
     this.fileOperationsService = new FileOperationsService();
 
     this.operatingSystemService = new OperatingSystemService();
+
+    this.inputValidator = new InputValidator([
+      "--EOL",
+      "--cpus",
+      "--homedir",
+      "--username",
+      "--architecture",
+    ]);
+    this.validateInput = this.inputValidator.validateInput.bind(
+      this.inputValidator,
+    );
   }
 
-  async methodAllocator({ command, firstArg, secondArg }) {
+  async methodAllocator({ command, firstArg, secondArg, osCommand }) {
     const {
       ADD,
-      CD,
-      CP,
-      COMPRESS,
-      DECOMPRESS,
-      UP,
-      LS,
       CAT,
+      CD,
+      COMPRESS,
+      CP,
+      DECOMPRESS,
+      HASH,
+      LS,
+      OS,
       RN,
       RM,
       MV,
-      OS,
-      HASH,
+      UP,
     } = ALLOWED_INPUT_COMMANDS;
 
     const OPERATING_SYSTEM_COMMANDS = {
@@ -67,8 +82,13 @@ export class CommandService {
         await this.fileOperationsService.moveFile(firstArg, secondArg);
         break;
       case OS:
-        if (OPERATING_SYSTEM_COMMANDS[firstArg]) {
-          OPERATING_SYSTEM_COMMANDS[firstArg]();
+        const isValidOSCommand = this.validateInput(osCommand);
+        if (!isValidOSCommand) {
+          displayMessage(INVALID_INPUT_MESSAGE, COLORS.ORANGE);
+          break;
+        }
+        if (OPERATING_SYSTEM_COMMANDS[osCommand]) {
+          OPERATING_SYSTEM_COMMANDS[osCommand]();
         }
         break;
       case HASH:

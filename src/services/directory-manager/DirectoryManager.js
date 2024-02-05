@@ -1,12 +1,12 @@
 import fs from "fs";
 import os from "os";
+import path from "path";
 import { promisify } from "util";
 import { displayMessage } from "../../app/helpers.js";
+import { getPreparedTableFiles, sortFiles } from "./helpers.js";
 import { NO_SUCH_DIRECTORY_MESSAGE } from "../command-service/constants.js";
 import { CANT_GO_HIGHER_MESSAGE, UP_COMMAND } from "./constants.js";
-import { getPreparedTableFiles, sortFiles } from "./helpers.js";
 import { COLORS, OPERATION_FAILED_MESSAGE } from "../../app/constants.js";
-import path from "path";
 
 export class DirectoryManager {
   alertCurrentPath() {
@@ -22,9 +22,8 @@ export class DirectoryManager {
 
   async changePath(filePath) {
     const fp = path.resolve(process.cwd(), filePath);
-    const isExists = await this.checkFileAccessibility(fp);
 
-    console.log("absolutePath", fp);
+    const isExists = await this.checkFileAccessibility(fp);
 
     if (isExists) {
       process.chdir(fp);

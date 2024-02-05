@@ -19,6 +19,7 @@ export class App {
     this.userService = new UserService();
 
     this.directoryManager = new DirectoryManager();
+
     this.alertCurrentPath = this.directoryManager.alertCurrentPath;
 
     this.inputValidator = new InputValidator(validCommands);
@@ -31,6 +32,7 @@ export class App {
     this.asyncQuestion = this.readlineService.promisifyQuestionMethod(this.rl);
 
     this.commandService = new CommandService();
+
     this.methodAllocator = this.commandService.methodAllocator;
 
     this.commandService = new CommandService();
@@ -59,12 +61,12 @@ export class App {
         command,
         firstArg: absolutePath,
         secondArg,
+        osCommand: firstArg,
       });
 
       await this.runLoop();
     } catch (error) {
       displayMessage(OPERATION_FAILED_MESSAGE, COLORS.RED);
-      console.log(error);
       await this.runLoop();
     }
   }

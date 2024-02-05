@@ -1,12 +1,14 @@
 import os from "os";
+import path from "path";
 import { UserService } from "../services/user-service/UserService.js";
 import { DirectoryManager } from "../services/directory-manager/DirectoryManager.js";
 import { InputValidator } from "../services/input-validator/InputValidator.js";
 import { validCommands } from "../services/input-validator/constants.js";
 import { ReadlineService } from "../services/readline-service/ReadlineService.js";
 import { CommandService } from "../services/command-service/CommandService.js";
-import { displayErrorMessage } from "./helpers.js";
+import { displayMessage } from "./helpers.js";
 import {
+  COLORS,
   EXIT_MESSAGE,
   INVALID_INPUT_MESSAGE,
   OPERATION_FAILED_MESSAGE,
@@ -39,26 +41,30 @@ export class App {
 
     try {
       const answer = await this.asyncQuestion("");
-      const [command, inputPath] = answer.split(" ");
+      const [command, firstArg, secondArg] = answer.split(" ");
 
-      const isValidAnswer = this.validateInput(command);
+      const isValidCommand = this.validateInput(command);
 
-      if (answer === EXIT_MESSAGE) {
+      if (command === EXIT_MESSAGE) {
         return this.rl.close();
       }
 
-      if (!isValidAnswer) {
-        displayErrorMessage(INVALID_INPUT_MESSAGE, 1);
+      if (!isValidCommand) {
+        displayMessage(INVALID_INPUT_MESSAGE, COLORS.ORANGE);
       }
 
+      const absolutePath = path.resolve(firstArg ?? "");
+
       await this.methodAllocator({
+        absolutePath,
         command,
-        inputPath,
+        firstArg,
+        secondArg,
       });
 
       await this.runLoop();
     } catch (error) {
-      displayErrorMessage(OPERATION_FAILED_MESSAGE, 0);
+      displayMessage(OPERATION_FAILED_MESSAGE, COLORS.RED);
       console.log(error);
       await this.runLoop();
     }

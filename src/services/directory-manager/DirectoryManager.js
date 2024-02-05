@@ -1,11 +1,11 @@
 import fs from "fs";
-import path from "path";
-import { displayErrorMessage } from "../../app/helpers.js";
-import { NO_SUCH_DIRECTORY_MESSAGE } from "../command-service/constants.js";
 import os from "os";
 import { promisify } from "util";
+import { displayMessage } from "../../app/helpers.js";
+import { NO_SUCH_DIRECTORY_MESSAGE } from "../command-service/constants.js";
 import { CANT_GO_HIGHER_MESSAGE, UP_COMMAND } from "./constants.js";
 import { getPreparedTableFiles, sortFiles } from "./helpers.js";
+import { COLORS, OPERATION_FAILED_MESSAGE } from "../../app/constants.js";
 
 export class DirectoryManager {
   alertCurrentPath() {
@@ -19,15 +19,13 @@ export class DirectoryManager {
     return !error;
   }
 
-  async changePath(inputPath) {
-    const absolutePath = path.resolve(inputPath ?? "");
-
-    const isExists = await this.checkFileAccessibility(absolutePath);
+  async changePath(filePath) {
+    const isExists = await this.checkFileAccessibility(filePath);
 
     if (isExists) {
-      process.chdir(absolutePath);
+      process.chdir(filePath);
     } else {
-      displayErrorMessage(NO_SUCH_DIRECTORY_MESSAGE, 1);
+      displayMessage(NO_SUCH_DIRECTORY_MESSAGE, COLORS.ORANGE);
     }
   }
 
@@ -35,7 +33,7 @@ export class DirectoryManager {
     const isInHomeDirectory = process.cwd() === os.homedir();
 
     if (isInHomeDirectory) {
-      displayErrorMessage(CANT_GO_HIGHER_MESSAGE, 1);
+      displayMessage(CANT_GO_HIGHER_MESSAGE, COLORS.ORANGE);
     } else {
       process.chdir(UP_COMMAND);
     }
@@ -49,9 +47,10 @@ export class DirectoryManager {
       const allFiles = await readdir(cwd);
 
       const preparedTableFiles = await getPreparedTableFiles(allFiles, cwd);
+
       console.table(sortFiles(preparedTableFiles));
     } catch (error) {
-      console.log("Something went wrong");
+      console.log(OPERATION_FAILED_MESSAGE, COLORS.RED);
     }
   }
 }

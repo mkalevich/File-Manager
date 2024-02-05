@@ -127,26 +127,42 @@ export class FileOperationsService {
   };
 
   compress(pathToFile, pathToDestination) {
+    const __dirname = path.dirname(pathToFile);
+    const pathDestination = path.join(__dirname, pathToDestination);
+
     const brotliStream = zlib.createBrotliCompress();
     const readableStream = fs.createReadStream(pathToFile);
-    const writableStream = fs.createWriteStream(pathToDestination);
+    const writableStream = fs.createWriteStream(pathDestination);
 
-    readableStream.pipe(brotliStream).pipe(writableStream);
-
-    writableStream.on("finish", () => {
-      console.log("File compressed successfully!");
-    });
+    readableStream
+      .pipe(brotliStream)
+      .pipe(writableStream)
+      .on("error", (error) => {
+        const errorMessage = `${OPERATION_FAILED_MESSAGE}, ${error}`;
+        displayMessage(errorMessage, COLORS.RED);
+      })
+      .on("finish", () => {
+        console.log("File compressed successfully!");
+      });
   }
 
   decompress(pathToFile, pathToDestination) {
+    const __dirname = path.dirname(pathToFile);
+    const pathDestination = path.join(__dirname, pathToDestination);
+
     const brotliStream = zlib.createBrotliDecompress();
     const readableStream = fs.createReadStream(pathToFile);
-    const writableStream = fs.createWriteStream(pathToDestination);
+    const writableStream = fs.createWriteStream(pathDestination);
 
-    readableStream.pipe(brotliStream).pipe(writableStream);
-
-    writableStream.on("finish", () => {
-      console.log("File decompressed successfully!");
-    });
+    readableStream
+      .pipe(brotliStream)
+      .pipe(writableStream)
+      .on("error", (error) => {
+        const errorMessage = `${OPERATION_FAILED_MESSAGE}, ${error}`;
+        displayMessage(errorMessage, COLORS.RED);
+      })
+      .on("finish", () => {
+        console.log("File decompressed successfully!");
+      });
   }
 }

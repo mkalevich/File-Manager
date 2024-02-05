@@ -6,6 +6,7 @@ import { NO_SUCH_DIRECTORY_MESSAGE } from "../command-service/constants.js";
 import { CANT_GO_HIGHER_MESSAGE, UP_COMMAND } from "./constants.js";
 import { getPreparedTableFiles, sortFiles } from "./helpers.js";
 import { COLORS, OPERATION_FAILED_MESSAGE } from "../../app/constants.js";
+import path from "path";
 
 export class DirectoryManager {
   alertCurrentPath() {
@@ -20,10 +21,13 @@ export class DirectoryManager {
   }
 
   async changePath(filePath) {
-    const isExists = await this.checkFileAccessibility(filePath);
+    const fp = path.resolve(process.cwd(), filePath);
+    const isExists = await this.checkFileAccessibility(fp);
+
+    console.log("absolutePath", fp);
 
     if (isExists) {
-      process.chdir(filePath);
+      process.chdir(fp);
     } else {
       displayMessage(NO_SUCH_DIRECTORY_MESSAGE, COLORS.ORANGE);
     }

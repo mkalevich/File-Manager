@@ -53,12 +53,11 @@ export class App {
         displayMessage(INVALID_INPUT_MESSAGE, COLORS.ORANGE);
       }
 
-      const absolutePath = path.resolve(firstArg ?? "");
+      const absolutePath = path.resolve(process.cwd(), firstArg ?? "");
 
       await this.methodAllocator({
-        absolutePath,
         command,
-        firstArg,
+        firstArg: absolutePath,
         secondArg,
       });
 

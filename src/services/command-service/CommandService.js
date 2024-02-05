@@ -13,7 +13,7 @@ export class CommandService {
     this.operatingSystemService = new OperatingSystemService();
   }
 
-  async methodAllocator({ command, absolutePath, secondArg, firstArg }) {
+  async methodAllocator({ command, firstArg, secondArg }) {
     const {
       ADD,
       CD,
@@ -40,19 +40,19 @@ export class CommandService {
 
     switch (command) {
       case CD:
-        await this.directoryManager.changePath(absolutePath);
+        await this.directoryManager.changePath(firstArg);
         break;
       case UP:
-        await this.directoryManager.goUp(absolutePath);
+        await this.directoryManager.goUp(firstArg);
         break;
       case LS:
-        await this.directoryManager.displayFilesInTable(absolutePath);
+        await this.directoryManager.displayFilesInTable(firstArg);
         break;
       case CAT:
-        await this.fileOperationsService.readAndPrintFileContent(absolutePath);
+        await this.fileOperationsService.readAndPrintFileContent(firstArg);
         break;
       case ADD:
-        await this.fileOperationsService.createFile(absolutePath);
+        await this.fileOperationsService.createFile(firstArg);
         break;
       case RN:
         await this.fileOperationsService.renameFile(firstArg, secondArg);
